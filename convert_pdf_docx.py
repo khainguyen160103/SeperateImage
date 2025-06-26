@@ -12,39 +12,40 @@ app_id = os.getenv('APP_ID')
 
 def send_pdf_to_mathpix(file_path):
     """Gửi PDF đến Mathpix API để convert"""
-    print(f"🚀 Bắt đầu gửi PDF: {os.path.basename(file_path)}")
-    
-    if not app_key or not app_id:
-        print("❌ APP_KEY hoặc APP_ID chưa được thiết lập!")
-        return None
-       
-    with open(file_path , 'rb') as f: 
-        try:
+    try:
+        with open(file_path, "rb") as f:
             print("📤 Đang gửi request đến Mathpix...")
-            response = requests.post("https://api.mathpix.com/v3/pdf", 
-                                headers= { 
-                                    "app_id" : app_id,
-                                    "app_key": app_key
-                                },
-                                files={'file': f} , 
-                                data= {"conversion_formats[docx]" : "true"}
+
+            files = {
+                "file": (os.path.basename(file_path), f, "application/pdf")
+            }
+
+            response = requests.post(
+                "https://api.mathpix.com/v3/pdf",
+                headers={
+                    "app_id": 'companyname_edmicroeducationcompanylimited_taxcode_0108115077_address_5thfloor_tayhabuilding_no_19tohuustreet_trungvanward_namtuliemdistrict_hanoicity_vietnam_d72a10_0d24ba',
+                    "app_key": 'b39568046dd9cf1ca3bddca9ee7d25cb509df41b091c60f077d699011dcc9ec3'
+                },
+                files=files
+                # data={"conversion_formats[docx]": "true"}
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
-                print(result)
                 print("✅ Gửi thành công!")
+                print(result)
                 return result
             else:
                 print(f"❌ Lỗi API: {response.status_code} - {response.text}")
                 return None
-        except Exception as e:
-            print(f"❌ Lỗi: {e}")
-            return None
+
+    except Exception as e:
+        print(f"❌ Lỗi: {e}")
+        return None
 
 def check_conversion_status(pdf_id):
     """Kiểm tra trạng thái conversion"""
-    headers = {'app_key': app_key, 'app_id': app_id}
+    headers = {'app_key': 'b39568046dd9cf1ca3bddca9ee7d25cb509df41b091c60f077d699011dcc9ec3', 'app_id': 'companyname_edmicroeducationcompanylimited_taxcode_0108115077_address_5thfloor_tayhabuilding_no_19tohuustreet_trungvanward_namtuliemdistrict_hanoicity_vietnam_d72a10_0d24ba'}
     
     try:
         url = f"https://api.mathpix.com/v3/pdf/{pdf_id}"
@@ -63,51 +64,48 @@ def check_conversion_status(pdf_id):
 def download_docx(pdf_id, output_path):
     """Download file DOCX đã convert"""
     headers = {'app_key': app_key, 'app_id': app_id}
-    
+    print(pdf_id)
+    time.sleep(15)
     try:
         url = f"https://api.mathpix.com/v3/pdf/{pdf_id}.docx"
         response = requests.get(url, headers=headers)
+        # print(response.json())
         
-        if response.status_code == 200:
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
-            with open(output_path, 'wb') as f:
-                f.write(response.content)
-            
+        with open(output_path, 'wb') as f:
+            f.write(response.content)
             print(f"✅ Downloaded: {output_path}")
-            return output_path
-        else:
-            print(f"❌ Lỗi download: {response.status_code}")
-            return None
+        return output_path
     except Exception as e:
-        print(f"❌ Lỗi download: {e}")
+        print(f"❌ Lỗi download: {str(e)}")
         return None
 
-def wait_for_conversion(pdf_id, max_wait_time=300):
-    """Chờ conversion hoàn thành"""
-    print(f"⏳ Chờ conversion hoàn thành...")
-    start_time = time.time()
+# def wait_for_conversion(pdf_id, max_wait_time=2000):
+#     """Chờ conversion hoàn thành"""
+#     print(f"⏳ Chờ conversion hoàn thành...")
+#     start_time = time.time()
     
-    while time.time() - start_time < max_wait_time:
-        status_result = check_conversion_status(pdf_id)
+#     while time.time() - start_time < max_wait_time:
+#         status_result = check_conversion_status(pdf_id)
         
-        if not status_result:
-            return False
+#         if not status_result:
+#             return False
         
-        status = status_result.get('status', 'unknown')
-        print(f"📋 Status: {status}")
+#         status = status_result.get('status', 'unknown')
+#         print(f"📋 Status: {status}")
         
-        if status == 'completed':
-            print("✅ Conversion hoàn thành!")
-            return True
-        elif status == 'error':
-            print(f"❌ Conversion lỗi: {status_result.get('error', 'Unknown')}")
-            return False
+#         if status == 'completed':
+#             print("✅ Conversion hoàn thành!")
+#             return True
+#         elif status == 'error':
+#             print(f"❌ Conversion lỗi: {status_result.get('error', 'Unknown')}")
+#             return False
         
-        time.sleep(10)
+#         time.sleep(10)
     
-    print("⏰ Timeout!")
-    return False
+#     print("⏰ Timeout!")
+#     return False
 
 def convert_pdf_to_docx(pdf_path, output_path=None):
     """Convert PDF to DOCX"""
@@ -123,15 +121,21 @@ def convert_pdf_to_docx(pdf_path, output_path=None):
         return None
     
     pdf_id = result.get('pdf_id')
+    # pdf_id = "2025_06_26_d7ac6f92205324b78fd9g"
     if not pdf_id:
         print("❌ Không nhận được pdf_id")
         return None
     
     print(f"📋 PDF ID: {pdf_id}")
     
+    # Đợi 15 giây để server cập nhật
+    print("⏳ Đợi 15 giây để server cập nhật PDF ID...")
+    time.sleep(15)
+    print("✅ Hoàn thành delay, bắt đầu check status...")
+    
     # Chờ conversion
-    if not wait_for_conversion(pdf_id):
-        return None
+    # if not wait_for_conversion(pdf_id):
+    #     return None
     
     # Tạo output path
     if not output_path:
@@ -150,7 +154,7 @@ def convert_pdf_to_docx(pdf_path, output_path=None):
 # THỰC HIỆN CONVERT NGAY
 if __name__ == "__main__": 
     # Đặt đường dẫn PDF của bạn ở đây
-    pdf_path = r"E:\Data\Work\SeperateImage\Unlock_SBT\SBT Toan 6 tap 1 ruot(TB2025)_KNTT (14.3.2025) (1).pdf"
+    pdf_path = r"E:\Data\Work\SeperateImage\Unlock_SBT\SBT Vat li 10 ruot (TB 2025)_KNTT (16.3.2025).pdf"
     
     print(f"🔑 App ID: {app_id[:10]}..." if app_id else "❌ APP_ID not found")
     print(f"🔑 App Key: {app_key[:10]}..." if app_key else "❌ APP_KEY not found")

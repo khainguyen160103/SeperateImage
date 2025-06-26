@@ -113,7 +113,12 @@ def extract_images_with_precise_index(docx_path, output_folder="images"):
             if hinh_matches:
                 found_index = f"Hình {hinh_matches[-1]}"  # Lấy số cuối cùng
                 print(f"🖼️  Phát hiện hình: {found_index}")
-
+            
+            if not found_index:
+                cau_matches = re.findall(r'Câu\s+(\d+)',text) 
+                if cau_matches:
+                    found_index = f"Câu {cau_matches[-1]}"  # Lấy số cuối cùng
+                    print(f"📝 Phát hiện câu: {found_index}")
             if not found_index:
                 h_matches = re.findall(r'H\.(\d+\.\d+)', text)
                 if h_matches:
@@ -332,7 +337,7 @@ def main():
     print("=" * 60)
     
     # Đường dẫn mặc định
-    default_path = r"E:\Data\Work\SeperateImage\output\SBT Toan 6 tap 1 ruot(TB2025)_KNTT (14.3.2025) (1)_converted.docx"
+    default_path = r"E:\Data\Work\SeperateImage\output\SBT Vat Li 11-xinhe-10.3.25_converted.docx"
     
     docx_path = input("Nhập đường dẫn file DOCX (Enter cho mặc định): ").strip()
     if not docx_path:

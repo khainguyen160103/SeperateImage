@@ -261,8 +261,8 @@ def main():
     print("="*50)
     
     # Đường dẫn mặc định
-    images_folder = r"e:\Data\Work\SeperateImage\images"
-    json_file = r"e:\Data\Work\SeperateImage\code.json"
+    images_folder = r"E:\Data\Work\SeperateImage\vatly10"
+    json_file = r"E:\Data\Work\SeperateImage\vatly10.json"
     
     # Kiểm tra đường dẫn
     if not os.path.exists(images_folder):
