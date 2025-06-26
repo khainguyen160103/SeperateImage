@@ -23,8 +23,8 @@ def send_pdf_to_mathpix(file_path):
             response = requests.post(
                 "https://api.mathpix.com/v3/pdf",
                 headers={
-                    "app_id": 'companyname_edmicroeducationcompanylimited_taxcode_0108115077_address_5thfloor_tayhabuilding_no_19tohuustreet_trungvanward_namtuliemdistrict_hanoicity_vietnam_d72a10_0d24ba',
-                    "app_key": 'b39568046dd9cf1ca3bddca9ee7d25cb509df41b091c60f077d699011dcc9ec3'
+                    "app_id": app_id,
+                    "app_key": app_key
                 },
                 files=files
                 # data={"conversion_formats[docx]": "true"}
@@ -45,7 +45,8 @@ def send_pdf_to_mathpix(file_path):
 
 def check_conversion_status(pdf_id):
     """Kiểm tra trạng thái conversion"""
-    headers = {'app_key': 'b39568046dd9cf1ca3bddca9ee7d25cb509df41b091c60f077d699011dcc9ec3', 'app_id': 'companyname_edmicroeducationcompanylimited_taxcode_0108115077_address_5thfloor_tayhabuilding_no_19tohuustreet_trungvanward_namtuliemdistrict_hanoicity_vietnam_d72a10_0d24ba'}
+    headers = {'app_key': app_key,
+                'app_id':app_id}
     
     try:
         url = f"https://api.mathpix.com/v3/pdf/{pdf_id}"
